@@ -1,0 +1,11 @@
+.DS_Store
+build/
+*.pbxuser
+*.perspective
+*.perspectivev3
+*.xcuserstate
+*.xcbkptlist
+*.xcsettings
+*.xcworkspace
+xcuserdata
+GGNAuthy/ParseConstants.swift
