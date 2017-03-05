@@ -6,23 +6,23 @@
 //  Copyright © 2016 Garric Nahapetian. All rights reserved.
 //
 
-import GGNObservable
+import Foundation
 
 final class Fetcher {
-    let output = Observable<[String: Any]>()
-
-    func fetch(with request: URLRequest) {
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            do {
-                guard let json = try JSONSerialization.jsonObject(
-                    with: data!,
-                    options: .allowFragments) as? [String: Any] else {
-                    return
-                }
-                self.output.emit(json)
-            } catch {
-                // handle errors
-            }
-        }.resume()
+    private var completion: (([String: Any]) -> Void)?
+    
+    func fetch(with request: URLRequest, completion: @escaping ([String: Any]) -> Void) {
+        self.completion = completion
+        
+        let session = URLSession.shared
+        let task = session.dataTask(with: request, completionHandler: completionHandler)
+        task.resume()
+    }
+    
+    private func completionHandler(data: Data?, response: URLResponse?, error: Error?) {
+        guard let data = data else { return }
+        let jsonObject = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
+        let json = jsonObject as? [String: Any] ?? [:]
+        completion?(json)
     }
 }

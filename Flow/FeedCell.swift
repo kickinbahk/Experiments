@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Cartography
 
 final class FeedCell: BaseCell {
     static var reuseID: String {
@@ -21,7 +20,7 @@ final class FeedCell: BaseCell {
     }
     
     override func setup() {
-        addSubview(photoImageView)
+        contentView.addSubview(photoImageView)
     }
     
     override func style() {
@@ -29,12 +28,15 @@ final class FeedCell: BaseCell {
     }
     
     override func layout() {
-        constrain(photoImageView) { photoImageView in
-            photoImageView.leading == photoImageView.superview!.leading + 10
-            photoImageView.trailing == photoImageView.superview!.trailing - 10
-            photoImageView.top == photoImageView.superview!.top + 10
-            photoImageView.bottom == photoImageView.superview!.bottom - 10
-        }
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate(
+            [
+                photoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+                photoImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+                photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+                photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
+            ]
+        )
     }
     
     func configure(with image: UIImage?) {

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Cartography
 
 class LoadingView: BaseView {
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.gray)
@@ -22,9 +21,13 @@ class LoadingView: BaseView {
     }
     
     override func layout() {
-        constrain(spinner) { spinner in
-            spinner.center == spinner.superview!.center
-        }
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate(
+            [
+                spinner.centerXAnchor.constraint(equalTo: centerXAnchor),
+                spinner.centerYAnchor.constraint(equalTo: centerYAnchor)
+            ]
+        )
     }
     
     func startSpinner() {

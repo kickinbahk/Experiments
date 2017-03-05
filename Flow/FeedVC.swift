@@ -8,27 +8,13 @@
 
 import UIKit
 
-final class FeedVC: UIViewController, UITableViewDataSource, UITableViewDelegate, UITableViewDataSourcePrefetching {
+final class FeedVC: UIViewController {
+    fileprivate let viewModel: FeedVM
     private let tableView = UITableView(frame: CGRect.zero, style: .plain)
-    private let viewModel: FeedVM
 
     init(viewModel: FeedVM) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        
-        tableView.estimatedRowHeight = UIScreen.main.bounds.width
-        tableView.rowHeight = UIScreen.main.bounds.width
-        tableView.dataSource = self
-        tableView.register(
-            FeedCell.self,
-            forCellReuseIdentifier: FeedCell.reuseID
-        )
-        
-        self.viewModel.doneRefreshingOutput.onNext { [weak self] in
-            DispatchQueue.main.async {
-                self?.tableView.reloadData()
-            }
-        }
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -38,24 +24,39 @@ final class FeedVC: UIViewController, UITableViewDataSource, UITableViewDelegate
     override func loadView() {
         view = tableView
     }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configure
+    }
 
+    private var configure: Void {
+        tableView.estimatedRowHeight = UIScreen.main.bounds.width
+        tableView.rowHeight = UIScreen.main.bounds.width
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(FeedCell.self, forCellReuseIdentifier: FeedCell.reuseID)
+    }
+}
+
+extension FeedVC: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.numberOfRows
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let dequeuedCell = tableView.dequeueReusableCell(withIdentifier: FeedCell.reuseID)
-        let cell = dequeuedCell as? FeedCell ?? FeedCell()
-        let image = viewModel.image(at: indexPath)
-        cell.configure(with: image)
-        return cell
+        return viewModel.cellForRow(at: indexPath, from: dequeuedCell)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UIScreen.main.bounds.width
     }
-    
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        indexPaths.forEach(viewModel.prefetchImage)
+}
+
+extension FeedVC: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: false)
+        viewModel.didSelectRow(at: indexPath)
     }
 }

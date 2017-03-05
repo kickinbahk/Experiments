@@ -21,8 +21,6 @@ class BaseView: UIView {
     }
     
     func setup() {}
-    
     func style() {}
-    
     func layout() {}
 }
